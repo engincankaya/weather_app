@@ -12,12 +12,13 @@ async def hava_durumu_api_cek(sehir):
     data = response.json()
 
     daily_temperatures = list()
-    for entry in data["list"]:
-        date_time = entry["dt_txt"]
-        if date_time.endswith("15:00:00"):
-            daily_temperatures.append(entry)
-    data["list"] = daily_temperatures
-    return data
+    if data["list"] is not None:
+        for entry in data["list"]:
+            date_time = entry["dt_txt"]
+            if date_time.endswith("15:00:00"):
+                daily_temperatures.append(entry)
+        data["list"] = daily_temperatures
+        return data
 
 
 async def hava_durumu(websocket, path):
@@ -26,19 +27,21 @@ async def hava_durumu(websocket, path):
         sehirler = [
             "Adana",
             "Adiyaman",
-            # "Afyonkarahisar",
-            # "Agri",
-            # "Amasya",
-            # "Ankara",
-            # "Antalya",
-            # "Adana",
-            # "Adiyaman",
-            # "Afyonkarahisar",
-            # "Agri",
-            # "Amasya",
-            # "Ankara",
-            # "Antalya",
-            # ... Diğer şehirler ...
+            "Afyonkarahisar",
+            "Agri",
+            "Ankara",
+            "Antalya",
+            "Ardahan",
+            "Artvin",
+            "Aydin",
+            "Bayburt",
+            "Bursa",
+            "Canakkale",
+            "Diyarbakir",
+            "Duzce",
+            "Edirne",
+            "Istanbul",
+            "Izmir",
         ]
 
         for sehir in sehirler:
@@ -48,7 +51,7 @@ async def hava_durumu(websocket, path):
 
         await websocket.send(json.dumps(hava_durumu_bilgisi_list))
 
-        time.sleep(15)
+        time.sleep(60)
 
 
 def start_websocket_server():

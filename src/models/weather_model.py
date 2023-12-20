@@ -5,10 +5,11 @@ class WeatherModel:
     instances = []
 
     def __init__(self, data=None):
-        self.city_name = data["city"]["name"]
-        self.following_days = []
-        self.last_month = {}
-        self.update(data)
+        if data:
+            self.city_name = data["city"]["name"]
+            self.following_days = []
+            self.last_year_data = {}
+            self.update(data)
 
     def update(self, data):
         days_infos = data["list"]
@@ -23,8 +24,8 @@ class WeatherModel:
         self.date = today_infos["dt"]
         self.description = today_infos["weather"][0]["description"]
 
-        self.last_month = self.create_last_month_fake_data()
-        self.following_days = self.update_following_days(days_infos)
+        self.last_year_data = self.create_last_year_fake_data()
+        self.following_days = self.update_following_days(days_infos[1:])
         self.creation_date = datetime.now().strftime("%H:%M:%S")
 
         del days_infos, today_infos
@@ -38,37 +39,44 @@ class WeatherModel:
         new_instance = cls(data)
         cls.instances.append(new_instance)
 
-    def update_following_days(self, days_infos):
+    @classmethod
+    def get_all_cities_main_weather_datas(cls):
+        return [instance._extract_main_infos() for instance in cls.instances]
+
+    def _extract_main_infos(self):
+        data_dict = self.__dict__.copy()
+
+        del data_dict["following_days"]
+        del data_dict["last_year_data"]
+
+        return data_dict
+
+    @classmethod
+    def get_detailed_infos_by_name(cls, city_name):
+        for instance in cls.instances:
+            if instance.city_name == city_name:
+                return instance.__dict__
+
+    def update_following_days(self, following_days):
         following_days_list = list()
 
-        for day in days_infos[1:]:
+        for day in following_days:
             day_infos = {
                 "temp": day["main"]["temp"],
                 "description": day["weather"][0]["description"],
                 "date": day["dt"],
-                "wind": days_infos[0]["wind"],
+                "wind": self.wind,
             }
             following_days_list.append(day_infos)
 
         return following_days_list
 
-    def create_last_month_fake_data(self):
-        sunrise = datetime.utcfromtimestamp(self.sunrise) - timedelta(minutes=30)
-        sunset = datetime.utcfromtimestamp(self.sunset) - timedelta(minutes=30)
-        date = datetime.utcfromtimestamp(self.date) - timedelta(days=30)
+    def create_last_year_fake_data(self):
+        date = datetime.utcfromtimestamp(self.date) - timedelta(days=365)
         temp = self.temp + 2.2
         return {
             "temp": temp,
             "wind": self.wind,
             "description": self.description,
-            "sunrise": int(sunrise.timestamp()),
-            "sunset": int(sunset.timestamp()),
             "date": int(date.timestamp()),
         }
-
-    def get_weather_data(self):
-        return self.__dict__
-
-    @classmethod
-    def get_all_cities_weather_datas(cls):
-        return [nesne.__dict__ for nesne in cls.instances]

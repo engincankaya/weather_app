@@ -1,34 +1,24 @@
-import requests
+import wx
+import threading
+import time
 
-# OpenWeatherMap API anahtarını buraya ekleyin
+# 250, 447
 
-api_key = "7fdb6f5734ab0e721e58db2859bffe7c"
-# Şehir adını ve ülke kodunu belirtin
-city_name = "Istanbul"
-country_code = "TR"
 
-# API isteği için URL oluşturun
-url = f"http://api.openweathermap.org/data/2.5/forecast?q={city_name},{country_code}&lang=tr&units=metric&appid={api_key}"
+class WeatherApp(wx.Frame):
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
 
-# API'den verileri çekin
-response = requests.get(url)
-data = response.json()
+        self.panel = wx.Panel(self)
+        self_vertical_layout = wx.BoxSizer(wx.VERTICAL)
+        button1 = wx.Button(self_vertical_layout, Fla)
 
-daily_temperatures = []
+    def on_close(self, event):
+        self.Destroy()
 
-# Verileri işleyin
-for entry in data["list"]:
-    date_time = entry["dt_txt"]
+    def update_weather_view(self, weather_data_list):
+        wx.CallAfter(self._update_weather_view, weather_data_list)
 
-    # Eğer saat 15:00:00 ise devam et, değilse bir sonraki veriye geç
-    if date_time.endswith("15:00:00"):
-        temperature = entry["main"]["temp"]
-        description = entry["weather"][0]["description"]
-
-        daily_temperatures.append(entry)
-
-# for date, temperatures in daily_temperatures.items():
-#     print(
-#         f'Date: {date}, Min Temperature: {temperatures["min"]}°C, Max Temperature: {temperatures["max"]}°C'
-#     )
-print(daily_temperatures)
+    def _update_weather_view(self, weather_data_list):
+        # Clear the existing content before updating with new data
+        self.text_ctrl.Clear()

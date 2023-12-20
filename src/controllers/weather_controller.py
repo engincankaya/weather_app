@@ -3,22 +3,28 @@ import websocket
 import json
 import wx
 from models.weather_model import WeatherModel
+from views.weather_view import WeatherApp
 
 
 class WeatherController:
-    def __init__(self, view):
-        self.model = None
-
-        self.view = view
+    def __init__(self):
+        self.model = WeatherModel()
+        self.view = WeatherApp(self)
         self.ws = WeatherWsController(self)
         self.ws_thread = Thread(target=self.ws.run_forever)
         self.ws_thread.start()
 
     def update_weather(self, data_list):
         for data in data_list:
-            WeatherModel.create_or_update(data)
-        weather_data_list = WeatherModel.get_all_cities_weather_datas()
+            self.model.create_or_update(data)
+        weather_data_list = self.model.get_all_cities_main_weather_datas()
         wx.CallAfter(self.view.update_weather_view(weather_data_list))
+
+    def search_detailed_infos_by_name(self, city_name):
+        return self.model.get_detailed_infos_by_name(city_name)
+
+    def run(self):
+        self.view.Show()
 
     # def on_close(self):
     #     self.model.ws.close()

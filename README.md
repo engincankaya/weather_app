@@ -18,6 +18,7 @@ Bu proje, MVC mimarisini temel alır. MVC, yazılım geliştirme sürecini organ
 Proje kaynak kodları `src` klasörü içindedir. Proje, ana başlangıç noktası olan `main.py` dosyası ile çalıştırılabilir.
 
 ```bash
+pip install -r requirements.txt
 cd src
 python main.py
 ```

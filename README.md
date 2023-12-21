@@ -27,6 +27,7 @@ python main.py
 - Python 3
 - wxPython (GUI için)
 - WebSocket (Asenkron haberleşme için)
+- bcrypt (Kullanıcı şifresini hashlemek için)
 
 ## İleride Yapılabilecek İşler
 

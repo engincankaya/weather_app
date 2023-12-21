@@ -30,8 +30,6 @@ class WeatherApp(wx.Frame):
             self.SetSize((500, 447))
         else:
             self.SetSize((350, 447))
-        # Windows'a özel işlemleri burada gerçekleştirin
-        self.SetSize((350, 447))
         self.SetBackgroundColour(wx.Colour(34, 40, 49))
         self.scrolled_panel = scrolled.ScrolledPanel(self, wx.ID_ANY)
         self.scrolled_panel.SetupScrolling()

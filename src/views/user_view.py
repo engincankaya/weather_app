@@ -13,6 +13,7 @@ class UserView(wx.Frame):
             style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX),
         )
         self.controller = controller
+        self.SetBackgroundColour(wx.Colour(34, 40, 49))
         self.main_panel = wx.Panel(self, wx.ID_ANY)
         self.main_vertical_sizer = wx.BoxSizer(wx.VERTICAL)
         self.header_vertical_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -24,10 +25,12 @@ class UserView(wx.Frame):
         current_directory = os.getcwd()
         views_folder_path = os.path.join(current_directory, "views")
         app_logo_path = f"{views_folder_path}/icons/app_logo.png"
+        image = wx.Image(app_logo_path, wx.BITMAP_TYPE_PNG)
+        bitmap = wx.Bitmap(image)
         header_bitmap = wx.StaticBitmap(
             self.main_panel,
             wx.ID_ANY,
-            wx.Bitmap(app_logo_path, wx.BITMAP_TYPE_ANY),
+            bitmap,
         )
         header_bitmap.SetMinSize((120, 106))
         self.header_vertical_sizer.Add(

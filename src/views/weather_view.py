@@ -30,8 +30,7 @@ class WeatherApp(wx.Frame):
             self.SetSize((500, 447))
         else:
             self.SetSize((350, 447))
-        # Windows'a özel işlemleri burada gerçekleştirin
-        self.SetSize((350, 447))
+
         self.SetBackgroundColour(wx.Colour(34, 40, 49))
         self.scrolled_panel = scrolled.ScrolledPanel(self, wx.ID_ANY)
         self.scrolled_panel.SetupScrolling()
@@ -192,15 +191,15 @@ class WeatherApp(wx.Frame):
         current_directory = os.getcwd()
 
         # İcon klasörünün yolu
-        views_folder_path = os.path.join(current_directory, "views")
-        image = wx.Image(f"{views_folder_path}/icons/{icon}.png", wx.BITMAP_TYPE_PNG)
+        image_path = os.path.join(current_directory, "views", "icons", f"{icon}.png")
+        image = wx.Image(image_path, wx.BITMAP_TYPE_ANY)
+        image.Rescale(40, 40)
         bitmap = wx.Bitmap(image)
         bitmap_11 = wx.StaticBitmap(
             panel,
             wx.ID_ANY,
             bitmap,
         )
-        bitmap_11.SetMaxSize((40, 40))
         return bitmap_11
 
     def add_label_to_grid_sizer(self, grid_sizer, labels):

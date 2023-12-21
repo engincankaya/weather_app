@@ -73,7 +73,7 @@ async def weather_info(websocket, path):
 
         await websocket.send(json.dumps(weather_info_list))
 
-        time.sleep(60)
+        time.sleep(30)
 
 
 def start_websocket_server():

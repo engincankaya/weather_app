@@ -102,7 +102,7 @@ class WeatherApp(wx.Frame):
         nav_bar.Add(self.unit_combo_box, 0, 0, 0)
 
         info_text = wx.StaticText(
-            self.scrolled_panel, wx.ID_ANY, "Veriler dakikada bir güncellenmektedir."
+            self.scrolled_panel, wx.ID_ANY, "Veriler 30 saniyede bir güncellenmektedir."
         )
         info_text.SetForegroundColour(wx.Colour(238, 238, 238))
         info_text.SetFont(

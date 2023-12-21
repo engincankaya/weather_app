@@ -87,7 +87,18 @@ class WeatherDetailsFrame(wx.Frame):
             self.panel_1, wx.ID_ANY, f"Durum: {description}"
         )
         wind_label = wx.StaticText(self.panel_1, wx.ID_ANY, f"Rüzgar: {wind}")
-
+        self.set_label_properties(
+            date_label, 12, wx.Colour(238, 238, 238), wx.FONTWEIGHT_NORMAL
+        )
+        self.set_label_properties(
+            temp_label, 12, wx.Colour(238, 238, 238), wx.FONTWEIGHT_NORMAL
+        )
+        self.set_label_properties(
+            description_label, 12, wx.Colour(238, 238, 238), wx.FONTWEIGHT_NORMAL
+        )
+        self.set_label_properties(
+            wind_label, 12, wx.Colour(238, 238, 238), wx.FONTWEIGHT_NORMAL
+        )
         # Etiketleri grid sizer'a ekliyoruz.
         grid_sizer.Add(date_label, 0, 0, 0)
         grid_sizer.Add(temp_label, 0, 0, 0)

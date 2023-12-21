@@ -23,16 +23,17 @@ class UserView(wx.Frame):
 
     def create_ui(self):
         current_directory = os.getcwd()
-        views_folder_path = os.path.join(current_directory, "views")
-        app_logo_path = f"{views_folder_path}/icons/app_logo.png"
-        image = wx.Image(app_logo_path, wx.BITMAP_TYPE_PNG)
+        app_logo_path = os.path.join(
+            current_directory, "views", "icons", "app_logo.png"
+        )
+        image = wx.Image(app_logo_path, wx.BITMAP_TYPE_ANY)
+        image.Rescale(120, 106)
         bitmap = wx.Bitmap(image)
         header_bitmap = wx.StaticBitmap(
             self.main_panel,
             wx.ID_ANY,
             bitmap,
         )
-        header_bitmap.SetMinSize((120, 106))
         self.header_vertical_sizer.Add(
             header_bitmap,
             0,
@@ -41,10 +42,10 @@ class UserView(wx.Frame):
         )
 
         header_label = wx.StaticText(self.main_panel, wx.ID_ANY, "Weather App")
-        font_size = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT).GetPointSize()
+        header_label.SetForegroundColour(wx.Colour(238, 238, 238))
         header_label.SetFont(
             wx.Font(
-                font_size,
+                13,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,
@@ -107,7 +108,7 @@ class Login(UserView):
         register_label.SetForegroundColour(wx.Colour(50, 50, 204))
         register_label.SetFont(
             wx.Font(
-                13,
+                11,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,
@@ -176,7 +177,7 @@ class Register(UserView):
         login_label.SetForegroundColour(wx.Colour(50, 50, 204))
         login_label.SetFont(
             wx.Font(
-                13,
+                11,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,

@@ -30,6 +30,8 @@ class WeatherApp(wx.Frame):
             self.SetSize((500, 447))
         else:
             self.SetSize((350, 447))
+        # Windows'a özel işlemleri burada gerçekleştirin
+        self.SetSize((350, 447))
         self.SetBackgroundColour(wx.Colour(34, 40, 49))
         self.scrolled_panel = scrolled.ScrolledPanel(self, wx.ID_ANY)
         self.scrolled_panel.SetupScrolling()
@@ -96,7 +98,7 @@ class WeatherApp(wx.Frame):
             choices=["Santigrat", "Fahrenhayt"],
             style=wx.CB_DROPDOWN,
         )
-        self.unit_combo_box.SetMaxSize((120, 20))
+        self.unit_combo_box.SetMinSize((120, 20))
         self.unit_combo_box.Bind(wx.EVT_COMBOBOX, self.on_temperature_unit_change)
         nav_bar.Add(self.unit_combo_box, 0, 0, 0)
 

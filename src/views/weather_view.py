@@ -12,7 +12,6 @@ from utils.utils import (
 
 class WeatherApp(wx.Frame):
     def __init__(self, controller, user_fullname=None, *args, **kwds):
-        # Hava Durumu Uygulaması görünümünün başlatılması
         super().__init__(
             parent=None,
             id=wx.ID_ANY,
@@ -32,7 +31,6 @@ class WeatherApp(wx.Frame):
         self.create_ui()
 
     def create_ui(self):
-        # Kullanıcı arayüzünü oluştur
         parent_sizer = wx.BoxSizer(wx.VERTICAL)
         self.create_navbar(parent_sizer)
         self.vertical_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -63,7 +61,6 @@ class WeatherApp(wx.Frame):
         self.Layout()
 
     def create_navbar(self, parent_sizer):
-        # Navigasyon çubuğunu oluştur
         nav_bar = wx.BoxSizer(wx.HORIZONTAL)
         texts_sizer = wx.BoxSizer(wx.HORIZONTAL)
         parent_sizer.Add(nav_bar, 0, wx.ALL | wx.EXPAND, 5)
@@ -126,17 +123,14 @@ class WeatherApp(wx.Frame):
             texts_sizer.Add(user_fullname_text, 0, wx.LEFT, 83)
 
     def on_temperature_unit_change(self, event):
-        # Sıcaklık birim değişimine tepki ver
         self.selected_temp_unit = self.unit_combo_box.GetValue()
         wx.CallAfter(self.update_weather_view, self.weather_data_list)
 
     def update_weather_view(self, weather_data_list):
-        # Hava durumu görünümünü güncelle
         self.weather_data_list = weather_data_list
         wx.CallAfter(self.generate_city_items)
 
     def generate_city_items(self):
-        # Şehir öğelerini oluştur
         self.vertical_sizer.Clear(True)
         for data in self.weather_data_list:
             city_item_sizer = self.create_city_item(data, self.scrolled_panel)
@@ -147,7 +141,6 @@ class WeatherApp(wx.Frame):
         self.scrolled_panel.SetVirtualSize(self.scrolled_panel.GetBestVirtualSize())
 
     def create_city_item(self, data, panel):
-        # Şehir öğesini oluştur
         city_name = data["city_name"]
         temp = create_temp_value_text(self.selected_temp_unit, data["temp"])
         description = capitalize_first_letter(data["description"])
@@ -178,10 +171,7 @@ class WeatherApp(wx.Frame):
         return city_item_sizer
 
     def create_bitmap(self, panel, icon):
-        # İcon resmini oluştur
         current_directory = os.getcwd()
-
-        # views klasörünün yolu
         views_folder_path = os.path.join(current_directory, "views")
 
         bitmap_11 = wx.StaticBitmap(
@@ -199,7 +189,6 @@ class WeatherApp(wx.Frame):
     def create_labels_for_grid_sizer(
         self, panel, temp, city_name, description, wind, coord
     ):
-        # Grid sizer için etiketleri oluştur
         temp_label = self.create_label(panel, temp, wx.Colour(0, 173, 181), 13, True)
         city_name_label = self.create_label(
             panel, city_name, wx.Colour(238, 238, 238), 13, True
@@ -214,8 +203,9 @@ class WeatherApp(wx.Frame):
         return [temp_label, city_name_label, description_label, wind_label, coord_label]
 
     def create_label(self, panel, text, color, font_size, bold):
-        # Tek bir etiket oluştur
-        label = wx.StaticText(panel, wx.ID_ANY, text)
+        label = wx.StaticText(
+            panel, wx.ID_ANY, text, style=wx.ALIGN_LEFT | wx.ST_NO_AUTORESIZE
+        )
         label.SetForegroundColour(color)
         font = wx.Font(
             font_size,
@@ -229,8 +219,16 @@ class WeatherApp(wx.Frame):
         return label
 
     def on_city_click(self, event, city_name):
-        # Şehir detaylarını göster
         details_frame = WeatherDetailsFrame(
             self, city_name, self.controller, self.selected_temp_unit
         )
         details_frame.Show()
+
+
+app = wx.App(False)
+controller = (
+    YourControllerClass()
+)  # Replace YourControllerClass with the actual controller class
+weather_frame = WeatherApp(controller)
+weather_frame.Show()
+app.MainLoop()

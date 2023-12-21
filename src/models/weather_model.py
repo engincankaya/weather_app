@@ -23,6 +23,7 @@ class WeatherModel:
         self.wind = today_infos["wind"]
         self.date = today_infos["dt"]
         self.description = today_infos["weather"][0]["description"]
+        self.icon = today_infos["weather"][0]["icon"]
 
         self.last_year_data = self.create_last_year_fake_data()
         self.following_days = self.update_following_days(days_infos[1:])
@@ -64,6 +65,7 @@ class WeatherModel:
             day_infos = {
                 "temp": day["main"]["temp"],
                 "description": day["weather"][0]["description"],
+                "icon": day["weather"][0]["icon"],
                 "date": day["dt"],
                 "wind": self.wind,
             }

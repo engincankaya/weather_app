@@ -1,15 +1,18 @@
 import json
 import bcrypt
 import uuid
-import sys
+import re
 
-sys.path.append("/Users/engincankaya/Desktop/Calismalar/weather_app/src")
 from models.user_model import UserModel
+from views.user_view import UserView
+from views.weather_view import WeatherApp
+from controllers.weather_controller import WeatherController
 
 
 class UserController:
     def __init__(self):
         self.model = None
+        self.view = None
 
     def read_users_from_file(self):
         try:
@@ -27,54 +30,58 @@ class UserController:
             # Write the users list to the file in JSON format
             json.dump(users, file, indent=2)
 
-    def create_account(self):
+    def create_account(self, fullname, email, password):
         id = str(uuid.uuid4())
-        fullname = input("Full Name: ")
-        email = input("Email: ")
-        password = input("Password: ")
         # Hash the password using bcrypt
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
-
         # Read users from the file
-        users = self.read_users_from_file()
+        if self.validate_email(email):
+            users = self.read_users_from_file()
+            # Check if the email is already registered
+            if any(user["email"] == email for user in users):
+                self.view.display_error("Bu email adresi zaten kullanılmaktadır.")
+                return
+            # Add the new user
+            users.append(
+                {
+                    "fullname": fullname,
+                    "email": email,
+                    "id": id,
+                    "hashed_password": hashed_password.decode("utf-8"),
+                }
+            )
+            # Write users back to the file
+            self.write_users_to_file(users)
+            self.send_main_page(fullname)
+        else:
+            self.view.display_error("Geçersiz email formatı.")
 
-        # Add the new user
-        users.append(
-            {
-                "fullname": fullname,
-                "email": email,
-                "id": id,
-                "hashed_password": hashed_password.decode("utf-8"),
-            }
-        )
-
-        # Write users back to the file
-        self.write_users_to_file(users)
-
-        print("Account successfully created.")
-
-    def login(self):
-        email = input("Email: ")
-        password = input("Password: ")
-
+    def login(self, email, password):
         users = self.read_users_from_file()
         # Check username and password
         for user in users:
             if user["email"] == email and bcrypt.checkpw(
                 password.encode("utf-8"), user["hashed_password"].encode("utf-8")
             ):
-                print("Login successful! Welcome, {}.".format(user["fullname"]))
                 self.model = UserModel(user["fullname"], user["email"], user["id"])
-                print(self.model.get_user_infos())
+                self.send_main_page(user["fullname"])
                 return
 
-        print("Incorrect username or password. Please try again.")
+        self.view.display_error(
+            "Geçersiz mail adresi veya şifre. Lütfen tekrar deneyin"
+        )
 
+    def validate_email(self, email):
+        # Define a simple regex pattern for email validation
+        email_pattern = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 
-if __name__ == "__main__":
-    controller = UserController()
-    # Create an account
-    # controller.create_account()
+        # Use the regex pattern to match the email
+        if re.match(email_pattern, email):
+            return True
+        else:
+            return False
 
-    # Login function call
-    controller.login()
+    def send_main_page(self, user_fullname):
+        self.view.Hide()
+        controller = WeatherController(user_fullname)
+        controller.run()

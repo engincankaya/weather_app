@@ -10,3 +10,6 @@ class UserModel:
 
     def get_user_infos(self):
         return self.__dict__
+
+    def get_full_name(self):
+        return self.__dict__["_full_name"]

@@ -1,41 +1,76 @@
 import wx
+import os
 import wx.lib.scrolledpanel as scrolled
+
 from views.weather_view_details import WeatherDetailsFrame
+from utils.utils import (
+    capitalize_first_letter,
+    create_temp_value_text,
+    create_wind_value_text,
+)
 
 
 class WeatherApp(wx.Frame):
-    def __init__(self, controller, *args, **kwds):
-        kwds["style"] = kwds.get("style", 0) | wx.DEFAULT_FRAME_STYLE
-        kwds["style"] &= ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX)
-        super().__init__(parent=None, id=wx.ID_ANY, title="Hava Durumu Uygulaması")
+    def __init__(self, controller, user_fullname=None, *args, **kwds):
+        super().__init__(
+            parent=None,
+            id=wx.ID_ANY,
+            title="Hava Durumu Uygulaması",
+            style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX),
+        )
         self.controller = controller
+        self.user_fullname = user_fullname
+        self.weather_data_list = []
+        self.selected_temp_unit = "Santigrat"
 
-        self.SetSize((280, 447))
-        self.SetTitle("Weather App")
+        self.SetSize((350, 447))
         self.SetBackgroundColour(wx.Colour(34, 40, 49))
-
         self.scrolled_panel = scrolled.ScrolledPanel(self, wx.ID_ANY)
         self.scrolled_panel.SetupScrolling()
 
+        self.create_ui()
+
+    def create_ui(self):
         parent_sizer = wx.BoxSizer(wx.VERTICAL)
-
         self.create_navbar(parent_sizer)
-
         self.vertical_sizer = wx.BoxSizer(wx.VERTICAL)
         parent_sizer.Add(self.vertical_sizer, 1, wx.EXPAND, 8)
 
         self.scrolled_panel.SetSizer(parent_sizer)
+        if len(self.weather_data_list) == 0:
+            loading_text = wx.StaticText(
+                self.scrolled_panel,
+                wx.ID_ANY,
+                "Veriler Yükleniyor...",
+                style=wx.ALIGN_LEFT,
+            )
+            loading_text.SetForegroundColour(wx.Colour(238, 238, 238))
+            loading_text.SetFont(
+                wx.Font(
+                    15,
+                    wx.FONTFAMILY_DECORATIVE,
+                    wx.FONTSTYLE_NORMAL,
+                    wx.FONTWEIGHT_BOLD,
+                    0,
+                    "",
+                )
+            )
+            self.vertical_sizer.Add(
+                loading_text, 1, wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, 8
+            )
         self.Layout()
 
     def create_navbar(self, parent_sizer):
         nav_bar = wx.BoxSizer(wx.HORIZONTAL)
+        texts_sizer = wx.BoxSizer(wx.HORIZONTAL)
         parent_sizer.Add(nav_bar, 0, wx.ALL | wx.EXPAND, 5)
+        parent_sizer.Add(texts_sizer, 0, wx.EXPAND)
 
-        label_4 = wx.StaticText(
-            self.scrolled_panel, wx.ID_ANY, "24 Saatlik ", style=wx.ALIGN_LEFT
+        title_label = wx.StaticText(
+            self.scrolled_panel, wx.ID_ANY, "24 Saatlik Veriler", style=wx.ALIGN_LEFT
         )
-        label_4.SetForegroundColour(wx.Colour(238, 238, 238))
-        label_4.SetFont(
+        title_label.SetForegroundColour(wx.Colour(238, 238, 238))
+        title_label.SetFont(
             wx.Font(
                 15,
                 wx.FONTFAMILY_DECORATIVE,
@@ -45,112 +80,132 @@ class WeatherApp(wx.Frame):
                 "",
             )
         )
-        nav_bar.Add(label_4, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 8)
+        nav_bar.Add(title_label, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 8)
 
-        self.combo_box_2 = wx.ComboBox(
+        self.unit_combo_box = wx.ComboBox(
             self.scrolled_panel,
             wx.ID_ANY,
             choices=["Santigrat", "Fahrenhayt"],
             style=wx.CB_DROPDOWN,
         )
-        self.combo_box_2.SetMinSize((120, 20))
-        nav_bar.Add(self.combo_box_2, 0, 0, 0)
+        self.unit_combo_box.SetMinSize((120, 20))
+        self.unit_combo_box.Bind(wx.EVT_COMBOBOX, self.on_temperature_unit_change)
+        nav_bar.Add(self.unit_combo_box, 0, 0, 0)
 
-        sayac = wx.StaticText(self.scrolled_panel, wx.ID_ANY, "Yenilenme: 15s")
-        sayac.SetFont(
+        info_text = wx.StaticText(
+            self.scrolled_panel, wx.ID_ANY, "Veriler dakikada bir güncellenmektedir."
+        )
+        info_text.SetFont(
             wx.Font(
-                11,
+                10,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
                 0,
-                ".AppleSystemUIFont",
+                "",
             )
         )
-        parent_sizer.Add(sayac, 0, wx.ALIGN_RIGHT | wx.BOTTOM | wx.RIGHT, 6)
+        texts_sizer.Add(info_text, 0, wx.ALIGN_LEFT | wx.LEFT, 13)
+        if self.user_fullname:
+            user_fullname_text = wx.StaticText(
+                self.scrolled_panel, wx.ID_ANY, self.user_fullname
+            )
+            user_fullname_text.SetFont(
+                wx.Font(
+                    10,
+                    wx.FONTFAMILY_DEFAULT,
+                    wx.FONTSTYLE_NORMAL,
+                    wx.FONTWEIGHT_NORMAL,
+                    0,
+                    "",
+                )
+            )
+            texts_sizer.Add(user_fullname_text, 0, wx.LEFT, 83)
+
+    def on_temperature_unit_change(self, event):
+        self.selected_temp_unit = self.unit_combo_box.GetValue()
+        wx.CallAfter(self.update_weather_view, self.weather_data_list)
 
     def update_weather_view(self, weather_data_list):
-        wx.CallAfter(self.generate_city_items, weather_data_list)
+        self.weather_data_list = weather_data_list
+        wx.CallAfter(self.generate_city_items)
 
-    def generate_city_items(self, weather_data_list):
+    def generate_city_items(self):
         self.vertical_sizer.Clear(True)
-        for data in weather_data_list:
-            vertical_sizer_item = self.create_city_item(data)
-            self.vertical_sizer.Add(vertical_sizer_item, 0, wx.EXPAND | wx.ALL, 10)
+        for data in self.weather_data_list:
+            city_item_sizer = self.create_city_item(data, self.scrolled_panel)
+            self.vertical_sizer.Add(city_item_sizer, 0, wx.EXPAND | wx.ALL, 20)
+
         self.scrolled_panel.Layout()
         self.scrolled_panel.SetupScrolling(scroll_x=False)
         self.scrolled_panel.SetVirtualSize(self.scrolled_panel.GetBestVirtualSize())
 
-    def create_city_item(self, data):
+    def create_city_item(self, data, panel):
         city_name = data["city_name"]
-        temp = f"{data['temp']}°C"
-        desp = data["description"]
-        wind = f"{data['wind']['speed']} m/s, {data['wind']['deg']}°"
+        temp = create_temp_value_text(self.selected_temp_unit, data["temp"])
+        description = capitalize_first_letter(data["description"])
+        wind = create_wind_value_text(data["wind"])
+        icon = data["icon"].replace("n", "d")
+        coord = f"E:{'{:.2f}'.format(data['coord']['lat'])}, B:{'{:.2f}'.format(data['coord']['lon'])}"
 
-        vertical_sizer_item = wx.BoxSizer(wx.HORIZONTAL)
+        city_item_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        bitmap_11 = self.create_bitmap(panel, icon)
+        city_item_sizer.Add(bitmap_11, 0, wx.ALIGN_CENTER_VERTICAL)
 
-        bitmap_11 = self.create_bitmap()
-        vertical_sizer_item.Add(bitmap_11, 0, wx.ALIGN_CENTER_VERTICAL)
+        grid_sizer = wx.GridSizer(3, 2, 7, 7)
+        city_item_sizer.Add(grid_sizer, 2, wx.LEFT | wx.TOP, 20)
 
-        item_right_side = wx.BoxSizer(wx.VERTICAL)
-        vertical_sizer_item.Add(item_right_side, 2, wx.EXPAND | wx.LEFT, 20)
+        labels = self.create_labels_for_grid_sizer(
+            panel, temp, city_name, description, wind, coord
+        )
+        self.add_label_to_grid_sizer(grid_sizer, labels)
 
-        top_infos_sizer = self.create_top_infos_sizer(temp, city_name)
-        item_right_side.Add(top_infos_sizer, 1, wx.BOTTOM | wx.EXPAND | wx.RIGHT, 7)
+        if panel == self.scrolled_panel:
+            button = wx.Button(panel, label="Detay")
+            grid_sizer.Add(button, 0, wx.EXPAND)
+            button.Bind(
+                wx.EVT_BUTTON,
+                lambda event, city_name=city_name: self.on_city_click(event, city_name),
+            )
 
-        label_35 = self.create_description_label(desp)
-        item_right_side.Add(label_35, 1, wx.BOTTOM, 2)
+        return city_item_sizer
 
-        bottom_infos_sizer = self.create_bottom_infos_sizer(wind)
-        item_right_side.Add(bottom_infos_sizer, 1, wx.EXPAND | wx.RIGHT, 7)
+    def create_bitmap(self, panel, icon):
+        current_directory = os.getcwd()
 
-        return vertical_sizer_item
+        # İcon klasörünün yolu
+        views_folder_path = os.path.join(current_directory, "views")
 
-    def create_bitmap(self):
         bitmap_11 = wx.StaticBitmap(
-            self.scrolled_panel,
+            panel,
             wx.ID_ANY,
-            wx.Bitmap(
-                "/Users/engincankaya/Desktop/resimler/sunny.png", wx.BITMAP_TYPE_ANY
-            ),
+            wx.Bitmap(f"{views_folder_path}/icons/{icon}.png", wx.BITMAP_TYPE_ANY),
         )
         bitmap_11.SetMinSize((40, 40))
         return bitmap_11
 
-    def create_top_infos_sizer(self, temp, city_name):
-        top_infos_sizer = wx.BoxSizer(wx.HORIZONTAL)
+    def add_label_to_grid_sizer(self, grid_sizer, labels):
+        for label in labels:
+            grid_sizer.Add(label, 0, 0, 0, 0)
 
-        label_33 = self.create_label(temp, wx.Colour(0, 173, 181), 13, True)
-        top_infos_sizer.Add(label_33, 1, 0, 0)
-
-        label_34 = self.create_label(city_name, wx.Colour(238, 238, 238), 13, True)
-        label_34.Bind(
-            wx.EVT_LEFT_DOWN,
-            lambda event, city_name=city_name: self.on_city_click(event, city_name),
+    def create_labels_for_grid_sizer(
+        self, panel, temp, city_name, description, wind, coord
+    ):
+        temp_label = self.create_label(panel, temp, wx.Colour(0, 173, 181), 13, True)
+        city_name_label = self.create_label(
+            panel, city_name, wx.Colour(238, 238, 238), 13, True
         )
-        top_infos_sizer.Add(label_34, 2, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 3)
-
-        return top_infos_sizer
-
-    def create_description_label(self, desp):
-        label_35 = self.create_label(desp, wx.Colour(209, 209, 209), 12, False)
-        return label_35
-
-    def create_bottom_infos_sizer(self, wind):
-        bottom_infos_sizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        Ruzgar_copy_7 = self.create_label(
-            "Rüzgar:", wx.Colour(238, 238, 238), 13, False
+        description_label = self.create_label(
+            panel, description, wx.Colour(238, 238, 238), 13, False
         )
-        bottom_infos_sizer.Add(Ruzgar_copy_7, 1, wx.ALIGN_CENTER_VERTICAL, 0)
+        wind_label = self.create_label(panel, wind, wx.Colour(209, 209, 209), 12, False)
+        coord_label = self.create_label(
+            panel, coord, wx.Colour(209, 209, 209), 12, False
+        )
+        return [temp_label, city_name_label, description_label, wind_label, coord_label]
 
-        label_41 = self.create_label(wind, wx.Colour(209, 209, 209), 12, False)
-        bottom_infos_sizer.Add(label_41, 2, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 3)
-
-        return bottom_infos_sizer
-
-    def create_label(self, text, color, font_size, bold):
-        label = wx.StaticText(self.scrolled_panel, wx.ID_ANY, text)
+    def create_label(self, panel, text, color, font_size, bold):
+        label = wx.StaticText(panel, wx.ID_ANY, text)
         label.SetForegroundColour(color)
         font = wx.Font(
             font_size,
@@ -164,5 +219,7 @@ class WeatherApp(wx.Frame):
         return label
 
     def on_city_click(self, event, city_name):
-        details_frame = WeatherDetailsFrame(self, city_name, self.controller)
+        details_frame = WeatherDetailsFrame(
+            self, city_name, self.controller, self.selected_temp_unit
+        )
         details_frame.Show()

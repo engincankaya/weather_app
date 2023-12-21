@@ -7,9 +7,9 @@ from views.weather_view import WeatherApp
 
 
 class WeatherController:
-    def __init__(self):
+    def __init__(self, user_fullname=False):
         self.model = WeatherModel()
-        self.view = WeatherApp(self)
+        self.view = WeatherApp(self, user_fullname)
         self.ws = WeatherWsController(self)
         self.ws_thread = Thread(target=self.ws.run_forever)
         self.ws_thread.start()
@@ -25,13 +25,6 @@ class WeatherController:
 
     def run(self):
         self.view.Show()
-
-    # def on_close(self):
-    #     self.model.ws.close()
-    #     self.model_thread.join()
-
-    # def get_latest_weather_data(self):
-    #     return self.model.to_dict
 
 
 class WeatherWsController:

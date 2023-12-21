@@ -81,7 +81,7 @@ class WeatherApp(wx.Frame):
         title_label.SetForegroundColour(wx.Colour(238, 238, 238))
         title_label.SetFont(
             wx.Font(
-                15,
+                15 if platform.system() == "Windows" else 12,
                 wx.FONTFAMILY_DECORATIVE,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,
@@ -107,7 +107,7 @@ class WeatherApp(wx.Frame):
         info_text.SetForegroundColour(wx.Colour(238, 238, 238))
         info_text.SetFont(
             wx.Font(
-                10,
+                10 if platform.system() == "Windows" else 7,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
@@ -124,7 +124,7 @@ class WeatherApp(wx.Frame):
             user_fullname_text.SetForegroundColour(wx.Colour(238, 238, 238))
             user_fullname_text.SetFont(
                 wx.Font(
-                    10,
+                    10 if platform.system() == "Windows" else 7,
                     wx.FONTFAMILY_DEFAULT,
                     wx.FONTSTYLE_NORMAL,
                     wx.FONTWEIGHT_NORMAL,
@@ -227,6 +227,7 @@ class WeatherApp(wx.Frame):
         # Tek bir etiket oluştur
         label = wx.StaticText(panel, wx.ID_ANY, text)
         label.SetForegroundColour(color)
+        font_size = (font_size - 2) if platform.system() == "Windows" else font_size
         font = wx.Font(
             font_size,
             wx.FONTFAMILY_DEFAULT,

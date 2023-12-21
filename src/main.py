@@ -1,6 +1,5 @@
 import wx
 import threading
-from controllers.weather_controller import WeatherController
 from controllers.user_controller import UserController
 from views.user_view import Register
 from websocket_server import start_websocket_server

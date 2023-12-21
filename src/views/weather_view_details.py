@@ -19,6 +19,7 @@ class WeatherDetailsFrame(wx.Frame):
             style=wx.DEFAULT_FRAME_STYLE & ~(wx.RESIZE_BORDER | wx.MAXIMIZE_BOX),
         )
         self.SetTitle(f"{city_name} Detaylı Bilgiler")
+        self.SetBackgroundColour(wx.Colour(34, 40, 49))
         self.controller = controller
         self.parent_view = parent
         self.selected_temp_unit = selected_temp_unit

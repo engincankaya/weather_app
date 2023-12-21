@@ -10,6 +10,7 @@ from utils.utils import (
 
 class WeatherDetailsFrame(wx.Frame):
     def __init__(self, parent, city_name, controller, selected_temp_unit):
+        # Hava Durumu Detayları penceresinin başlatılması
         super().__init__(
             parent,
             wx.ID_ANY,
@@ -19,37 +20,35 @@ class WeatherDetailsFrame(wx.Frame):
         )
         self.SetTitle(f"{city_name} Detaylı Bilgiler")
         self.controller = controller
-        self.paret_view = parent
+        self.parent_view = parent
         self.selected_temp_unit = selected_temp_unit
         self.city_data = self.get_city_weather_infos(city_name)
 
-        # Create the main panel
+        # Ana panelin oluşturulması
         self.panel_1 = wx.Panel(self, wx.ID_ANY)
-
-        # Set up the layout
         self.setup_layout()
 
     def setup_layout(self):
-        # Create the main sizer
+        # Ana sizer'ı oluştur
         parent_sizer = wx.BoxSizer(wx.VERTICAL)
 
         top_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        # Create today's informations from WeatherApp class
-        today_infos = self.paret_view.create_city_item(self.city_data, self.panel_1)
+        # Bugünkü bilgileri WeatherApp sınıfından oluştur
+        today_infos = self.parent_view.create_city_item(self.city_data, self.panel_1)
         top_sizer.Add(today_infos, 1, wx.EXPAND, 0)
 
-        # Add last year's information
+        # Geçen yılın bilgilerini ekle
         last_year_infos = self.create_last_year_layout()
         top_sizer.Add(last_year_infos, 1, wx.EXPAND, 0)
 
         parent_sizer.Add(top_sizer, 1, wx.EXPAND | wx.LEFT, 7)
 
-        # Add following days' information
+        # Takip eden günlerin bilgilerini ekle
         following_days_sizer = wx.BoxSizer(wx.HORIZONTAL)
         parent_sizer.Add(following_days_sizer, 2, wx.EXPAND, 0)
         self.create_following_days(following_days_sizer)
 
-        # Set the main sizer for the panel
+        # Panel için ana sizer'ı ayarla
         self.panel_1.SetSizer(parent_sizer)
         self.Layout()
 
@@ -65,53 +64,53 @@ class WeatherDetailsFrame(wx.Frame):
         description = self.city_data["last_year_data"]["description"]
         description = capitalize_first_letter(description)
         wind = create_wind_value_text(self.city_data["last_year_data"]["wind"])
-        # Create the layout for last year's information comparison
+        # Geçen yılın bilgileri ile karşılaştırma için düzeni oluştur
         last_year_infos = wx.StaticBoxSizer(
             wx.StaticBox(self.panel_1, wx.ID_ANY, ""), wx.VERTICAL
         )
 
-        # Add label for last year comparison
-        label_1 = wx.StaticText(
+        title = wx.StaticText(
             self.panel_1, wx.ID_ANY, "Geçen Yıl Değerleri ile Kıyaslama"
         )
-        self.set_label_properties(
-            label_1, 14, wx.Colour(0, 173, 181), wx.FONTWEIGHT_BOLD
+        self.set_label_properties(title, 14, wx.Colour(0, 173, 181), wx.FONTWEIGHT_BOLD)
+        last_year_infos.Add(title, 0, wx.BOTTOM | wx.EXPAND, 10)
+
+        # Geçen yılın verileri için grid sizer ekliyoruz.
+        grid_sizer = wx.GridSizer(2, 2, 0, 0)
+        last_year_infos.Add(grid_sizer, 1, wx.EXPAND, 0)
+
+        # Geçen yılın verilerinin etiketlerini ekliyoruz.
+        date_label = wx.StaticText(self.panel_1, wx.ID_ANY, f"Tarih: {date}")
+        temp_label = wx.StaticText(self.panel_1, wx.ID_ANY, f"Sıcaklık:{temp_text}")
+        description_label = wx.StaticText(
+            self.panel_1, wx.ID_ANY, f"Durum: {description}"
         )
-        last_year_infos.Add(label_1, 0, wx.BOTTOM | wx.EXPAND, 10)
+        wind_label = wx.StaticText(self.panel_1, wx.ID_ANY, f"Rüzgar: {wind}")
 
-        # Add grid sizer for last year's data
-        sizer_6 = wx.GridSizer(2, 2, 0, 0)
-        last_year_infos.Add(sizer_6, 1, wx.EXPAND, 0)
-
-        # Add last year's data labels
-        label_5 = wx.StaticText(self.panel_1, wx.ID_ANY, f"Tarih: {date}")
-        label_3 = wx.StaticText(self.panel_1, wx.ID_ANY, f"Sıcaklık:{temp_text}")
-        label_4 = wx.StaticText(self.panel_1, wx.ID_ANY, f"Durum: {description}")
-        label_6 = wx.StaticText(self.panel_1, wx.ID_ANY, f"Rüzgar: {wind}")
-
-        # Add labels to the grid sizer
-        sizer_6.Add(label_5, 0, 0, 0)
-        sizer_6.Add(label_3, 0, 0, 0)
-        sizer_6.Add(label_4, 0, 0, 0)
-        sizer_6.Add(label_6, 0, 0, 0)
+        # Etiketleri grid sizer'a ekliyoruz.
+        grid_sizer.Add(date_label, 0, 0, 0)
+        grid_sizer.Add(temp_label, 0, 0, 0)
+        grid_sizer.Add(description_label, 0, 0, 0)
+        grid_sizer.Add(wind_label, 0, 0, 0)
 
         return last_year_infos
 
     def extract_temp_difference_text(self, temp_last_year, temp_difference):
+        # Sıcaklık farkı metnini çıkart
         if self.selected_temp_unit == "Santigrat":
             if temp_difference > 0:
-                temp_text = f"{temp_last_year}°C (+{temp_difference}°C daha sıcak)"
+                text = f"{temp_last_year}°C (+{temp_difference}°C daha sıcak)"
             else:
-                temp_text = f"{temp_last_year}°C (-{temp_difference}°C daha soğuk)"
+                text = f"{temp_last_year}°C (-{temp_difference}°C daha soğuk)"
         else:
             if temp_difference > 0:
-                temp_text = f"{temp_last_year}°F (+{temp_difference}°F daha sıcak)"
+                text = f"{temp_last_year}°F (+{temp_difference}°F daha sıcak)"
             else:
-                temp_text = f"{temp_last_year}°F (-{temp_difference}°F daha soğuk)"
-        return temp_text
+                text = f"{temp_last_year}°F (-{temp_difference}°F daha soğuk)"
+        return text
 
     def create_following_days(self, following_days_sizer):
-        # Create following days' information
+        # Takip eden günlerin bilgilerini oluşturma
         for data in self.city_data["following_days"]:
             following_day_infos = self.create_following_day_layout(data)
             following_days_sizer.Add(following_day_infos, 1, wx.EXPAND, 0)
@@ -123,16 +122,16 @@ class WeatherDetailsFrame(wx.Frame):
         icon = data["icon"].replace("n", "d")
         wind_text = create_wind_value_text(self.city_data["wind"])
 
-        # Create the layout for each following day's information
+        # Her takip eden gün bilgisi için düzeni oluşturma
         following_day_infos = wx.StaticBoxSizer(
             wx.StaticBox(self.panel_1, wx.ID_ANY, ""), wx.VERTICAL
         )
 
-        # Add weather icon
-        icon_bitmap = self.paret_view.create_bitmap(self.panel_1, icon)
+        # Hava durumu ikonunu ekle(Fonksiyonu WeatherApp classından çekiyoruz.)
+        icon_bitmap = self.parent_view.create_bitmap(self.panel_1, icon)
         following_day_infos.Add(icon_bitmap, 0, wx.ALIGN_CENTER_HORIZONTAL, 0)
 
-        # Add date and weather details
+        # Tarih ve hava detaylarını ekleme
         infos_vertical_sizer = wx.BoxSizer(wx.VERTICAL)
         following_day_infos.Add(infos_vertical_sizer, 1, wx.EXPAND | wx.TOP, 13)
 
@@ -143,7 +142,7 @@ class WeatherDetailsFrame(wx.Frame):
         wind = wx.StaticText(
             self.panel_1, wx.ID_ANY, wind_text, style=wx.ALIGN_CENTER_HORIZONTAL
         )
-        # Set properties for labels
+        # Etiketler için özellikleri ayarlama
         self.set_label_properties(
             date, 13, wx.Colour(238, 238, 238), wx.FONTWEIGHT_BOLD
         )
@@ -152,7 +151,7 @@ class WeatherDetailsFrame(wx.Frame):
             description, 12, wx.Colour(209, 209, 209), wx.FONTWEIGHT_NORMAL
         )
 
-        # Add labels to the sizer
+        # Etiketleri sizer'a ekleme
         infos_vertical_sizer.Add(date, 1, wx.ALIGN_CENTER_HORIZONTAL, 0)
 
         sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -163,7 +162,7 @@ class WeatherDetailsFrame(wx.Frame):
         sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
         infos_vertical_sizer.Add(sizer_2, 1, wx.EXPAND, 0)
 
-        # Set properties for labels
+        # Etiketler için özellikleri ayarla
         self.set_label_properties(
             wind_label, 13, wx.Colour(238, 238, 238), wx.FONTWEIGHT_NORMAL
         )
@@ -171,14 +170,14 @@ class WeatherDetailsFrame(wx.Frame):
             wind, 12, wx.Colour(209, 209, 209), wx.FONTWEIGHT_NORMAL
         )
 
-        # Add labels to the sizer
+        # Etiketleri sizer'a ekleme
         sizer_2.Add(wind_label, 1, 0, 0)
         sizer_2.Add(wind, 2, wx.LEFT, 3)
 
         return following_day_infos
 
     def set_label_properties(self, label, font_size, text_color, font_weight):
-        # Set common properties for labels
+        # Etiketler için ortak özellikleri ayarla
         label.SetForegroundColour(text_color)
         label.SetFont(
             wx.Font(

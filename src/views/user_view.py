@@ -1,9 +1,11 @@
 import wx
+import os
 from utils.utils import switch_page
 
 
 class UserView(wx.Frame):
     def __init__(self, controller, *args, **kwds):
+        # Kullanıcı arayüzü penceresi oluşturucu
         super().__init__(
             parent=None,
             id=wx.ID_ANY,
@@ -20,10 +22,17 @@ class UserView(wx.Frame):
         self.create_ui()
 
     def create_ui(self):
+        # Kullanıcı arayüzü bileşenlerini oluştur
+
+        current_directory = os.getcwd()
+
+        # views klasörünün yolu
+        views_folder_path = os.path.join(current_directory, "views")
+        app_logo_path = f"{views_folder_path}/icons/app_logo.png"
         header_bitmap = wx.StaticBitmap(
             self.main_panel,
             wx.ID_ANY,
-            wx.Bitmap("/Users/engincankaya/Downloads/3767036.png", wx.BITMAP_TYPE_ANY),
+            wx.Bitmap(app_logo_path, wx.BITMAP_TYPE_ANY),
         )
         header_bitmap.SetMinSize((120, 106))
         self.header_vertical_sizer.Add(
@@ -60,11 +69,13 @@ class UserView(wx.Frame):
         self.main_panel.Layout()
 
     def display_error(self, error_message):
+        # Hata mesajını görüntüle
         wx.MessageBox(error_message, "Error", wx.OK | wx.ICON_ERROR)
 
 
 class Login(UserView):
     def __init__(self, controller):
+        # Giriş sayfası penceresi oluşturucu
         super(Login, self).__init__(controller)
         self.controller.view = self
         self.email_text_ctrl = wx.TextCtrl(
@@ -77,6 +88,7 @@ class Login(UserView):
         self.setup_login_ui()
 
     def setup_login_ui(self):
+        # Giriş sayfası arayüz bileşenlerini oluştur
         self.email_text_ctrl.SetMinSize((300, 30))
         self.password_text_ctrl.SetMinSize((300, 30))
         self.login_button.SetMinSize((300, 30))
@@ -119,6 +131,7 @@ class Login(UserView):
         self.login_button.Bind(wx.EVT_BUTTON, self.on_login_button_click)
 
     def on_login_button_click(self, event):
+        # Giriş butonuna tıklandığında yapılacak işlemler
         email = self.email_text_ctrl.GetValue()
         password = self.password_text_ctrl.GetValue()
         self.controller.login(email, password)
@@ -126,6 +139,7 @@ class Login(UserView):
 
 class Register(UserView):
     def __init__(self, controller):
+        # Kayıt sayfası penceresi oluşturucu
         super(Register, self).__init__(controller)
         self.controller = controller
         self.controller.view = self
@@ -143,6 +157,7 @@ class Register(UserView):
         self.setup_register_ui()
 
     def setup_register_ui(self):
+        # Kayıt sayfası arayüz bileşenlerini oluştur
         self.fullname_text_ctrl.SetMinSize((300, 30))
         self.email_text_ctrl.SetMinSize((300, 30))
         self.password_text_ctrl.SetMinSize((300, 30))
@@ -188,6 +203,7 @@ class Register(UserView):
         self.register_button.Bind(wx.EVT_BUTTON, self.on_register_button_click)
 
     def on_register_button_click(self, event):
+        # Kayıt ol butonuna tıklandığında yapılacak işlemler
         fullname = self.fullname_text_ctrl.GetValue()
         email = self.email_text_ctrl.GetValue()
         password = self.password_text_ctrl.GetValue()

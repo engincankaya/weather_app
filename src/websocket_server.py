@@ -3,11 +3,26 @@ import websockets
 import requests
 import json
 import time
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+API_KEY = os.getenv("API_KEY")
+PORT = os.getenv("PORT")
 
 
-async def hava_durumu_api_cek(sehir):
-    API_KEY = "7fdb6f5734ab0e721e58db2859bffe7c"
-    url = f"http://api.openweathermap.org/data/2.5/forecast?q={sehir},TR&lang=tr&units=metric&appid={API_KEY}"
+async def fetch_weather_data(city):
+    """
+    Belirli bir şehrin hava durumu verilerini alır.
+
+    Args:
+        city (str): Hava durumu bilgilerinin alınacağı şehir.
+
+    Returns:
+        dict: Şehrin hava durumu verilerini içeren sözlük.
+    """
+    url = f"http://api.openweathermap.org/data/2.5/forecast?q={city},TR&lang=tr&units=metric&appid={API_KEY}"
     response = requests.get(url)
     data = response.json()
 
@@ -21,10 +36,17 @@ async def hava_durumu_api_cek(sehir):
         return data
 
 
-async def hava_durumu(websocket, path):
+async def weather_info(websocket, path):
+    """
+    WebSocket üzerinden sürekli olarak hava durumu bilgilerini gönderir.
+
+    Args:
+        websocket (WebSocket): Bilgilerin gönderileceği WebSocket nesnesi.
+        path: WebSocket'in bağlandığı yol (kullanılmıyor).
+    """
     while True:
-        hava_durumu_bilgisi_list = list()
-        sehirler = [
+        weather_info_list = list()
+        cities = [
             "Adana",
             "Adiyaman",
             "Afyonkarahisar",
@@ -44,21 +66,24 @@ async def hava_durumu(websocket, path):
             "Izmir",
         ]
 
-        for sehir in sehirler:
-            hava_durumu_bilgisi = await hava_durumu_api_cek(sehir)
-            if hava_durumu_bilgisi:
-                hava_durumu_bilgisi_list.append(hava_durumu_bilgisi)
+        for city in cities:
+            weather_data = await fetch_weather_data(city)
+            if weather_data:
+                weather_info_list.append(weather_data)
 
-        await websocket.send(json.dumps(hava_durumu_bilgisi_list))
+        await websocket.send(json.dumps(weather_info_list))
 
         time.sleep(60)
 
 
 def start_websocket_server():
-    # Create a new event loop for the thread
+    """
+    WebSocket sunucusunu başlatır ve sürekli olarak hava durumu bilgilerini gönderir.
+    """
+    # Yeni bir etkinlik döngüsü oluştur
     asyncio.set_event_loop(asyncio.new_event_loop())
 
-    start_server = websockets.serve(hava_durumu, "localhost", 8765)
+    start_server = websockets.serve(weather_info, "localhost", PORT)
     asyncio.get_event_loop().run_until_complete(start_server)
     asyncio.get_event_loop().run_forever()
 

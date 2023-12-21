@@ -7,6 +7,11 @@ from websocket_server import start_websocket_server
 
 
 def run_gui():
+    """
+    GUI uygulamasını başlatır.
+
+    Uygulamayı başlatır, kullanıcı kontrolcüsünü oluşturur ve kayıt sayfasını gösterir.
+    """
     app = wx.App(False)
     controller = UserController()
     view = Register(controller)
@@ -15,12 +20,12 @@ def run_gui():
 
 
 if __name__ == "__main__":
-    # Start the WebSocket server in a separate thread
+    # WebSocket sunucusunu ayrı bir thread'de başlat
     websocket_thread = threading.Thread(target=start_websocket_server)
     websocket_thread.start()
 
-    # Run the GUI application in the main thread
+    # GUI uygulamasını ana thread'de çalıştır
     run_gui()
 
-    # Wait for the WebSocket thread to finish
+    # WebSocket thread'inin tamamlanmasını bekle
     websocket_thread.join()

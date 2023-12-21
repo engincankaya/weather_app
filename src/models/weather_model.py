@@ -5,6 +5,7 @@ class WeatherModel:
     instances = []
 
     def __init__(self, data=None):
+        # Eğer veri mevcutsa, özellikleri başlat
         if data:
             self.city_name = data["city"]["name"]
             self.following_days = []
@@ -12,6 +13,7 @@ class WeatherModel:
             self.update(data)
 
     def update(self, data):
+        # Bugünkü ve takip eden günlerin hava durumu verilerini güncelle
         days_infos = data["list"]
         today_infos = days_infos[0]
 
@@ -33,6 +35,7 @@ class WeatherModel:
 
     @classmethod
     def create_or_update(cls, data):
+        # Şehir adına göre mevcut bir nesne varsa güncelle, yoksa yeni bir nesne oluştur
         for instance in cls.instances:
             if instance.city_name == data["city"]["name"]:
                 instance.update(data)
@@ -42,9 +45,11 @@ class WeatherModel:
 
     @classmethod
     def get_all_cities_main_weather_datas(cls):
+        # Tüm şehirlerin ana hava durumu verilerini al
         return [instance._extract_main_infos() for instance in cls.instances]
 
     def _extract_main_infos(self):
+        # Ana hava durumu verilerini çıkar
         data_dict = self.__dict__.copy()
 
         del data_dict["following_days"]
@@ -54,11 +59,13 @@ class WeatherModel:
 
     @classmethod
     def get_detailed_infos_by_name(cls, city_name):
+        # Şehir adına göre detaylı bilgileri al
         for instance in cls.instances:
             if instance.city_name == city_name:
                 return instance.__dict__
 
     def update_following_days(self, following_days):
+        # Takip eden günlerin hava durumu verilerini güncelle
         following_days_list = list()
 
         for day in following_days:
@@ -74,6 +81,7 @@ class WeatherModel:
         return following_days_list
 
     def create_last_year_fake_data(self):
+        # Geçen yılın sahte verilerini oluştur
         date = datetime.utcfromtimestamp(self.date) - timedelta(days=365)
         temp = self.temp + 2.2
         return {

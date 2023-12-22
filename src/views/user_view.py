@@ -15,6 +15,8 @@ class UserView(wx.Frame):
         )
         self.controller = controller
         self.SetBackgroundColour(wx.Colour(34, 40, 49))
+        icon_path = find_icon_path("app_icon.ico")
+        self.SetIcon(wx.Icon(icon_path, wx.BITMAP_TYPE_ICO))
         self.main_panel = wx.Panel(self, wx.ID_ANY)
         self.main_vertical_sizer = wx.BoxSizer(wx.VERTICAL)
         self.header_vertical_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -106,7 +108,7 @@ class Login(UserView):
         register_label.SetForegroundColour(wx.Colour(50, 50, 204))
         register_label.SetFont(
             wx.Font(
-                7 if platform.system() == "Windows" else 11,
+                8 if platform.system() == "Windows" else 11,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,
@@ -175,7 +177,7 @@ class Register(UserView):
         login_label.SetForegroundColour(wx.Colour(50, 50, 204))
         login_label.SetFont(
             wx.Font(
-                7 if platform.system() == "Windows" else 11,
+                8 if platform.system() == "Windows" else 11,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,

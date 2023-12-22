@@ -170,14 +170,8 @@ class WeatherDetailsFrame(wx.Frame):
 
         # Etiketleri sizer'a ekleme
         infos_vertical_sizer.Add(date, 1, wx.ALIGN_CENTER_HORIZONTAL, 0)
-
-        sizer_1 = wx.BoxSizer(wx.HORIZONTAL)
-        infos_vertical_sizer.Add(sizer_1, 1, wx.SHAPED, 0)
-        sizer_1.Add(temp, 1, 0, wx.EXPAND, 0)
-        sizer_1.Add(description, 1, wx.BOTTOM, 2)
-
-        sizer_2 = wx.BoxSizer(wx.HORIZONTAL)
-        infos_vertical_sizer.Add(sizer_2, 1, wx.EXPAND, 0)
+        grid_sizer = wx.GridSizer(2, 2, 0, 0)
+        infos_vertical_sizer.Add(grid_sizer, 2, wx.ALIGN_CENTER_HORIZONTAL, 0)
 
         # Etiketler için özellikleri ayarla
         self.set_label_properties(
@@ -186,16 +180,16 @@ class WeatherDetailsFrame(wx.Frame):
         self.set_label_properties(
             wind, 12, wx.Colour(209, 209, 209), wx.FONTWEIGHT_NORMAL
         )
-
-        # Etiketleri sizer'a ekleme
-        sizer_2.Add(wind_label, 1, 0, 0)
-        sizer_2.Add(wind, 2, wx.LEFT, 3)
+        grid_sizer.Add(temp, 0, 0, 0)
+        grid_sizer.Add(description, 0, 0, 0)
+        grid_sizer.Add(wind_label, 0, 0, 0)
+        grid_sizer.Add(wind, 0, 0, 0)
 
         return following_day_infos
 
     def set_label_properties(self, label, font_size, text_color, font_weight):
         # Etiketler için ortak özellikleri ayarla
-        font_size = (font_size - 4) if platform.system() == "Windows" else font_size
+        font_size = (font_size - 3) if platform.system() == "Windows" else font_size
         label.SetForegroundColour(text_color)
         label.SetFont(
             wx.Font(

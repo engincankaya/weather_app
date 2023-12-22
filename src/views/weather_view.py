@@ -25,7 +25,7 @@ class WeatherApp(wx.Frame):
         self.weather_data_list = []
         self.selected_temp_unit = "Santigrat"
 
-        self.SetSize((380, 447))
+        self.SetSize((410, 447))
         icon_path = find_icon_path("app_icon.ico")
         self.SetIcon(wx.Icon(icon_path, wx.BITMAP_TYPE_ICO))
 
@@ -79,7 +79,7 @@ class WeatherApp(wx.Frame):
         title_label.SetForegroundColour(wx.Colour(238, 238, 238))
         title_label.SetFont(
             wx.Font(
-                12 if platform.system() == "Windows" else 15,
+                13 if platform.system() == "Windows" else 15,
                 wx.FONTFAMILY_DECORATIVE,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,
@@ -106,7 +106,7 @@ class WeatherApp(wx.Frame):
         info_text.SetForegroundColour(wx.Colour(238, 238, 238))
         info_text.SetFont(
             wx.Font(
-                7 if platform.system() == "Windows" else 10,
+                8 if platform.system() == "Windows" else 10,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
@@ -123,7 +123,7 @@ class WeatherApp(wx.Frame):
             user_fullname_text.SetForegroundColour(wx.Colour(238, 238, 238))
             user_fullname_text.SetFont(
                 wx.Font(
-                    7 if platform.system() == "Windows" else 10,
+                    8 if platform.system() == "Windows" else 10,
                     wx.FONTFAMILY_DEFAULT,
                     wx.FONTSTYLE_NORMAL,
                     wx.FONTWEIGHT_NORMAL,
@@ -223,7 +223,7 @@ class WeatherApp(wx.Frame):
         # Tek bir etiket oluştur
         label = wx.StaticText(panel, wx.ID_ANY, text)
         label.SetForegroundColour(color)
-        font_size = (font_size - 4) if platform.system() == "Windows" else font_size
+        font_size = (font_size - 3) if platform.system() == "Windows" else font_size
         font = wx.Font(
             font_size,
             wx.FONTFAMILY_DEFAULT,

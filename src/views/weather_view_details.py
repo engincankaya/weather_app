@@ -1,11 +1,13 @@
 import wx
 import platform
+import os
 from utils.utils import (
     capitalize_first_letter,
     timestamp_to_date,
     create_temp_value_text,
     create_wind_value_text,
     convert_temp_value,
+    find_icon_path,
 )
 
 
@@ -21,6 +23,8 @@ class WeatherDetailsFrame(wx.Frame):
         )
         self.SetTitle(f"{city_name} Detaylı Bilgiler")
         self.SetBackgroundColour(wx.Colour(34, 40, 49))
+        icon_path = find_icon_path("app_icon.ico")
+        self.SetIcon(wx.Icon(icon_path, wx.BITMAP_TYPE_ICO))
         self.controller = controller
         self.parent_view = parent
         self.selected_temp_unit = selected_temp_unit

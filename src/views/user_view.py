@@ -1,7 +1,7 @@
 import wx
 import os
 import platform
-from utils.utils import switch_page
+from utils.utils import switch_page, find_icon_path
 
 
 class UserView(wx.Frame):
@@ -23,10 +23,7 @@ class UserView(wx.Frame):
         self.create_ui()
 
     def create_ui(self):
-        current_directory = os.getcwd()
-        app_logo_path = os.path.join(
-            current_directory, "views", "icons", "app_logo.png"
-        )
+        app_logo_path = find_icon_path("app_logo.png")
         image = wx.Image(app_logo_path, wx.BITMAP_TYPE_ANY)
         image.Rescale(120, 106)
         bitmap = wx.Bitmap(image)

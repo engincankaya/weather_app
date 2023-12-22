@@ -1,4 +1,5 @@
 from datetime import datetime
+import os
 
 
 def create_temp_value_text(selected_temp_unit, temp_value):
@@ -95,3 +96,16 @@ def switch_page(hide_function, switched_frame_show, event_skip_function):
     hide_function()
     switched_frame_show()
     event_skip_function()
+
+
+def find_icon_path(image_name):
+    """
+    Eklenilmek istenilen görselin yolunu bulur.
+
+    Args:
+        image_name (str): Yolu bulunmak istenilen görselin ismi.
+
+    Returns:
+        str: Tasarıma eklenicek görselin yol(path) bilgisi
+    """
+    return os.path.join(os.getcwd(), "views", "icons", image_name)

@@ -7,6 +7,7 @@ from utils.utils import (
     capitalize_first_letter,
     create_temp_value_text,
     create_wind_value_text,
+    find_icon_path,
 )
 
 
@@ -25,6 +26,8 @@ class WeatherApp(wx.Frame):
         self.selected_temp_unit = "Santigrat"
 
         self.SetSize((380, 447))
+        icon_path = find_icon_path("app_icon.ico")
+        self.SetIcon(wx.Icon(icon_path, wx.BITMAP_TYPE_ICO))
 
         self.SetBackgroundColour(wx.Colour(34, 40, 49))
         self.scrolled_panel = scrolled.ScrolledPanel(self, wx.ID_ANY)
@@ -93,6 +96,7 @@ class WeatherApp(wx.Frame):
             style=wx.CB_DROPDOWN,
         )
         self.unit_combo_box.SetMinSize((120, 20))
+        self.unit_combo_box.SetHint("Santigrat")
         self.unit_combo_box.Bind(wx.EVT_COMBOBOX, self.on_temperature_unit_change)
         nav_bar.Add(self.unit_combo_box, 0, 0, 0)
 
@@ -183,11 +187,8 @@ class WeatherApp(wx.Frame):
 
     def create_bitmap(self, panel, icon):
         # İcon resmini oluştur
-        current_directory = os.getcwd()
-
-        # İcon klasörünün yolu
-        image_path = os.path.join(current_directory, "views", "icons", f"{icon}.png")
-        image = wx.Image(image_path, wx.BITMAP_TYPE_ANY)
+        icon_path = find_icon_path(f"{icon}.png")
+        image = wx.Image(icon_path, wx.BITMAP_TYPE_ANY)
         image.Rescale(40, 40)
         bitmap = wx.Bitmap(image)
         bitmap_11 = wx.StaticBitmap(

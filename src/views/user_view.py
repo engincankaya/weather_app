@@ -1,5 +1,6 @@
 import wx
 import os
+import platform
 from utils.utils import switch_page
 
 
@@ -108,7 +109,7 @@ class Login(UserView):
         register_label.SetForegroundColour(wx.Colour(50, 50, 204))
         register_label.SetFont(
             wx.Font(
-                11,
+                7 if platform.system() == "Windows" else 11,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,
@@ -177,7 +178,7 @@ class Register(UserView):
         login_label.SetForegroundColour(wx.Colour(50, 50, 204))
         login_label.SetFont(
             wx.Font(
-                11,
+                7 if platform.system() == "Windows" else 11,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,

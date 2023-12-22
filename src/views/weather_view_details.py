@@ -1,4 +1,5 @@
 import wx
+import platform
 from utils.utils import (
     capitalize_first_letter,
     timestamp_to_date,
@@ -190,6 +191,7 @@ class WeatherDetailsFrame(wx.Frame):
 
     def set_label_properties(self, label, font_size, text_color, font_weight):
         # Etiketler için ortak özellikleri ayarla
+        font_size = (font_size - 4) if platform.system() == "Windows" else font_size
         label.SetForegroundColour(text_color)
         label.SetFont(
             wx.Font(

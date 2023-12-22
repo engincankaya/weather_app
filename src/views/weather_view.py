@@ -24,12 +24,7 @@ class WeatherApp(wx.Frame):
         self.weather_data_list = []
         self.selected_temp_unit = "Santigrat"
 
-        os_name = platform.system()
-
-        if os_name == "Windows":
-            self.SetSize((500, 447))
-        else:
-            self.SetSize((350, 447))
+        self.SetSize((380, 447))
 
         self.SetBackgroundColour(wx.Colour(34, 40, 49))
         self.scrolled_panel = scrolled.ScrolledPanel(self, wx.ID_ANY)
@@ -81,7 +76,7 @@ class WeatherApp(wx.Frame):
         title_label.SetForegroundColour(wx.Colour(238, 238, 238))
         title_label.SetFont(
             wx.Font(
-                15 if platform.system() == "Windows" else 12,
+                12 if platform.system() == "Windows" else 15,
                 wx.FONTFAMILY_DECORATIVE,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_BOLD,
@@ -107,7 +102,7 @@ class WeatherApp(wx.Frame):
         info_text.SetForegroundColour(wx.Colour(238, 238, 238))
         info_text.SetFont(
             wx.Font(
-                10 if platform.system() == "Windows" else 7,
+                7 if platform.system() == "Windows" else 10,
                 wx.FONTFAMILY_DEFAULT,
                 wx.FONTSTYLE_NORMAL,
                 wx.FONTWEIGHT_NORMAL,
@@ -124,7 +119,7 @@ class WeatherApp(wx.Frame):
             user_fullname_text.SetForegroundColour(wx.Colour(238, 238, 238))
             user_fullname_text.SetFont(
                 wx.Font(
-                    10 if platform.system() == "Windows" else 7,
+                    7 if platform.system() == "Windows" else 10,
                     wx.FONTFAMILY_DEFAULT,
                     wx.FONTSTYLE_NORMAL,
                     wx.FONTWEIGHT_NORMAL,
@@ -227,7 +222,7 @@ class WeatherApp(wx.Frame):
         # Tek bir etiket oluştur
         label = wx.StaticText(panel, wx.ID_ANY, text)
         label.SetForegroundColour(color)
-        font_size = (font_size - 2) if platform.system() == "Windows" else font_size
+        font_size = (font_size - 4) if platform.system() == "Windows" else font_size
         font = wx.Font(
             font_size,
             wx.FONTFAMILY_DEFAULT,
